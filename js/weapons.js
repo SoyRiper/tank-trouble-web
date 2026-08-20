@@ -2,10 +2,10 @@
 
 export const WEAPON_TYPES = {
   STANDARD: { name: 'Cannon', ammo: -1, cooldown: 0.26, maxActive: 5, color: '#1C1E21' },
-  MINIGUN: { name: 'Minigun', ammo: 32, cooldown: 0.055, maxActive: 25, color: '#E67E22' },
+  MINIGUN: { name: 'Minigun', ammo: 35, cooldown: 0.05, maxActive: 25, color: '#E67E22' },
   HOMING_MISSILE: { name: 'Missile', ammo: 3, cooldown: 0.7, maxActive: 2, color: '#E74C3C' },
   LASER: { name: 'Laser', ammo: 4, cooldown: 0.5, maxActive: 1, color: '#1ABC9C' },
-  FRAG_BOMB: { name: 'Frag Bomb', ammo: 2, cooldown: 0.85, maxActive: 2, color: '#D35400' },
+  FRAG_BOMB: { name: 'Frag Bomb', ammo: 3, cooldown: 0.8, maxActive: 2, color: '#D35400' },
   LANDMINE: { name: 'Landmine', ammo: 4, cooldown: 0.4, maxActive: 4, color: '#7F8C8D' },
   SHOTGUN: { name: 'Shotgun', ammo: 6, cooldown: 0.45, maxActive: 12, color: '#9B59B6' },
   PLASMA_ORB: { name: 'Plasma Orb', ammo: 2, cooldown: 1.1, maxActive: 1, color: '#2ECC71' },
@@ -14,7 +14,7 @@ export const WEAPON_TYPES = {
 };
 
 export class Bullet {
-  constructor(shooterId, x, y, dirX, dirY, speed = 410, isGatling = false, damage = 50) {
+  constructor(shooterId, x, y, dirX, dirY, speed = 420, isGatling = false, damage = 150) {
     this.shooterId = shooterId;
     this.x = x;
     this.y = y;
@@ -22,11 +22,11 @@ export class Bullet {
     this.vy = dirY * speed;
     this.speed = speed;
     this.damage = damage;
-    this.radius = isGatling ? 3.0 : 4.5;
+    this.radius = isGatling ? 3.2 : 4.5;
     this.maxBounces = isGatling ? 5 : 7;
     this.bounces = 0;
     this.life = 0;
-    this.maxLife = isGatling ? 7.0 : 12.0;
+    this.maxLife = isGatling ? 6.5 : 12.0;
     this.isGatling = isGatling;
     this.dead = false;
     this.color = '#1C1E21';
@@ -49,11 +49,11 @@ export class Bullet {
       // 1. Tank Collision (Zero Self-Damage: Never hit shooter)
       for (const tank of tanks) {
         if (!tank.dead) {
-          if (tank.id === this.shooterId) continue; // IMMUNITY TO OWN BULLETS
+          if (tank.id === this.shooterId) continue;
           const dist = Math.hypot(this.x - tank.x, this.y - tank.y);
           if (dist < this.radius + 13) {
             const isBank = this.bounces > 0;
-            const finalDamage = isBank ? Math.round(this.damage * 1.3) : this.damage;
+            const finalDamage = isBank ? Math.round(this.damage * 1.35) : this.damage;
             tank.takeDamage(this.shooterId, this.isGatling ? 'Minigun' : 'Cannon', finalDamage, isBank, particles);
             particles.addSparks(this.x, this.y, -this.vx, -this.vy, 10, '#E74C3C');
             this.dead = true;
@@ -138,12 +138,12 @@ export class Missile {
     this.x = x;
     this.y = y;
     this.rot = Math.atan2(dirY, dirX);
-    this.speed = 170;
-    this.maxSpeed = 470;
-    this.accel = 390;
-    this.turnSpeed = 4.4;
-    this.blastRadius = 90;
-    this.damage = 250;
+    this.speed = 180;
+    this.maxSpeed = 480;
+    this.accel = 400;
+    this.turnSpeed = 4.5;
+    this.blastRadius = 95;
+    this.damage = 400;
     this.life = 0;
     this.maxLife = 7.0;
     this.dead = false;
@@ -314,14 +314,14 @@ export class FragBomb {
     if (this.dead) return;
     this.dead = true;
     Sound.playExplosion(true);
-    particles.addShockwave(this.x, this.y, 80, '#D35400');
-    particles.addDebris(this.x, this.y, '#D35400', 12);
+    particles.addShockwave(this.x, this.y, 85, '#D35400');
+    particles.addDebris(this.x, this.y, '#D35400', 14);
 
     const count = 14;
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.2;
-      const speed = 360 + Math.random() * 80;
-      const b = new Bullet(this.shooterId, this.x, this.y, Math.cos(angle), Math.sin(angle), speed, true, 28);
+      const speed = 380 + Math.random() * 90;
+      const b = new Bullet(this.shooterId, this.x, this.y, Math.cos(angle), Math.sin(angle), speed, true, 55);
       b.maxLife = 5.0;
       projectiles.push(b);
     }
@@ -365,8 +365,8 @@ export class Landmine {
     this.armTimer = 0.5;
     this.life = 0;
     this.maxLife = 35.0;
-    this.blastRadius = 85;
-    this.damage = 300;
+    this.blastRadius = 90;
+    this.damage = 480;
     this.dead = false;
     Sound.playRicochet();
   }
@@ -397,7 +397,7 @@ export class Landmine {
     this.dead = true;
     Sound.playExplosion(true);
     particles.addShockwave(this.x, this.y, this.blastRadius, '#E74C3C');
-    particles.addDebris(this.x, this.y, '#7F8C8D', 10);
+    particles.addDebris(this.x, this.y, '#7F8C8D', 12);
 
     for (const t of tanks) {
       if (!t.dead && t.id !== this.shooterId) {
@@ -428,8 +428,8 @@ export class PlasmaOrb {
     this.shooterId = shooterId;
     this.x = x;
     this.y = y;
-    this.vx = dirX * 160;
-    this.vy = dirY * 160;
+    this.vx = dirX * 170;
+    this.vy = dirY * 170;
     this.radius = 11;
     this.life = 0;
     this.maxLife = 5.0;
@@ -453,7 +453,7 @@ export class PlasmaOrb {
         if (!t.dead && t.id !== this.shooterId) {
           const dist = Math.hypot(t.x - this.x, t.y - this.y);
           if (dist < 180) {
-            t.takeDamage(this.shooterId, 'Plasma Zap', 40, false, particles);
+            t.takeDamage(this.shooterId, 'Plasma Zap', 50, false, particles);
             Sound.playPlasma();
             particles.addSparks(t.x, t.y, 0, -1, 6, '#2ECC71');
           }
@@ -480,14 +480,14 @@ export class PlasmaOrb {
     if (this.dead) return;
     this.dead = true;
     Sound.playExplosion(true);
-    particles.addShockwave(this.x, this.y, 110, '#2ECC71');
+    particles.addShockwave(this.x, this.y, 115, '#2ECC71');
     particles.addDebris(this.x, this.y, '#2ECC71', 14);
 
     for (const t of tanks) {
       if (!t.dead && t.id !== this.shooterId) {
         const d = Math.hypot(t.x - this.x, t.y - this.y);
-        if (d <= 110) {
-          t.takeDamage(this.shooterId, 'BFG Plasma Orb', 200, false, particles);
+        if (d <= 115) {
+          t.takeDamage(this.shooterId, 'BFG Plasma Orb', 380, false, particles);
         }
       }
     }
@@ -571,7 +571,7 @@ export class LaserBeam {
           if (t.id === shooterId) continue;
           const dist = this._distToSeg(t.x, t.y, curX, curY, hitX, hitY);
           if (dist < 18) {
-            t.takeDamage(shooterId, 'Death Ray Laser', 280, bounce > 0, particles);
+            t.takeDamage(shooterId, 'Death Ray Laser', 320, bounce > 0, particles);
             particles.addSparks(t.x, t.y, -vx, -vy, 14, '#1ABC9C');
           }
         }
@@ -599,8 +599,7 @@ export class LaserBeam {
     if (t > 0 && t <= 1 && u >= 0 && u <= 1) {
       const dist = Math.hypot(dx1 * t, dy1 * t);
       const wlen = Math.hypot(dx2, dy2);
-      const nx = -dy2 / wlen;
-      const ny = dx2 / wlen;
+      const nx = -dy2 / wlen, ny = dx2 / wlen;
       const dot = dx1 * nx + dy1 * ny;
       return { dist, nx: dot < 0 ? nx : -nx, ny: dot < 0 ? ny : -ny };
     }
@@ -621,56 +620,51 @@ export class LaserBeam {
   }
 
   render(ctx) {
-    const alpha = this.life / this.maxLife;
-    ctx.strokeStyle = `rgba(26, 188, 156, ${alpha * 0.85})`;
-    ctx.lineWidth = 6 * alpha;
+    const alpha = Math.max(0, this.life / this.maxLife);
+    ctx.save();
+    ctx.strokeStyle = `rgba(26, 188, 156, ${alpha * 0.9})`;
+    ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(this.points[0].x, this.points[0].y);
-    for (let i = 1; i < this.points.length; i++) {
-      ctx.lineTo(this.points[i].x, this.points[i].y);
+    for (let i = 0; i < this.points.length; i++) {
+      if (i === 0) ctx.moveTo(this.points[i].x, this.points[i].y);
+      else ctx.lineTo(this.points[i].x, this.points[i].y);
     }
     ctx.stroke();
 
     ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1.8;
     ctx.stroke();
+    ctx.restore();
   }
 }
 
 export class Crate {
-  constructor(x, y, weaponType = null) {
+  constructor(x, y) {
     this.x = x;
     this.y = y;
+    const types = ['MINIGUN', 'HOMING_MISSILE', 'LASER', 'FRAG_BOMB', 'LANDMINE', 'SHOTGUN', 'PLASMA_ORB', 'SHIELD', 'MEDKIT'];
+    this.type = types[Math.floor(Math.random() * types.length)];
+    this.config = WEAPON_TYPES[this.type];
+    this.dead = false;
     this.bob = Math.random() * Math.PI * 2;
     this.life = 0;
-    this.dead = false;
-
-    if (!weaponType || weaponType === 'STANDARD') {
-      const keys = ['MINIGUN', 'HOMING_MISSILE', 'LASER', 'FRAG_BOMB', 'LANDMINE', 'SHOTGUN', 'PLASMA_ORB', 'SHIELD', 'MEDKIT'];
-      this.weaponType = keys[Math.floor(Math.random() * keys.length)];
-    } else {
-      this.weaponType = weaponType;
-    }
   }
 
   update(dt, tanks, particles) {
-    this.bob += dt * 4;
+    this.bob += dt * 3.5;
     this.life += dt;
-    if (this.life > 45) {
-      this.dead = true;
-      return;
-    }
 
-    for (const t of tanks) {
-      if (!t.dead) {
-        if (Math.hypot(t.x - this.x, t.y - this.y) < 24) {
-          if (this.weaponType === 'MEDKIT') {
-            t.heal(300, particles);
+    for (const tank of tanks) {
+      if (!tank.dead) {
+        if (Math.hypot(this.x - tank.x, this.y - tank.y) < 22) {
+          if (this.type === 'MEDKIT') {
+            tank.heal(350, particles);
+            Sound.playPowerup();
           } else {
-            t.equipWeapon(this.weaponType);
+            tank.equipWeapon(this.type);
+            Sound.playPowerup();
+            particles.addSparks(this.x, this.y, 0, -1, 14, this.config.color);
           }
-          Sound.playCrate();
-          particles.addSparks(this.x, this.y, 0, -1, 14, WEAPON_TYPES[this.weaponType].color);
           this.dead = true;
           return;
         }
@@ -679,36 +673,34 @@ export class Crate {
   }
 
   render(ctx) {
-    const offsetY = Math.sin(this.bob) * 3;
-    const wConfig = WEAPON_TYPES[this.weaponType];
-    const color = wConfig.color;
-
+    const offY = Math.sin(this.bob) * 2.5;
     ctx.save();
-    ctx.translate(this.x, this.y + offsetY);
+    ctx.translate(this.x, this.y + offY);
 
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    ctx.strokeRect(-13, -13, 26, 26);
-
-    ctx.fillStyle = '#1C1E21';
+    ctx.fillStyle = this.config.color;
     ctx.fillRect(-11, -11, 22, 22);
 
-    if (this.weaponType === 'MEDKIT') {
-      ctx.fillStyle = '#27AE60';
-      ctx.fillRect(-7, -2.5, 14, 5);
-      ctx.fillRect(-2.5, -7, 5, 14);
-    } else {
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(0, 0, 6.5, 0, Math.PI * 2);
-      ctx.fill();
+    ctx.strokeStyle = '#1C1E21';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(-11, -11, 22, 22);
 
-      ctx.fillStyle = '#fff';
-      ctx.beginPath();
-      ctx.arc(0, 0, 3, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 9px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
 
+    let icon = '📦';
+    if (this.type === 'MINIGUN') icon = '🔫';
+    if (this.type === 'HOMING_MISSILE') icon = '🚀';
+    if (this.type === 'LASER') icon = '⚡';
+    if (this.type === 'FRAG_BOMB') icon = '💣';
+    if (this.type === 'LANDMINE') icon = '💥';
+    if (this.type === 'SHOTGUN') icon = '💢';
+    if (this.type === 'PLASMA_ORB') icon = '🔮';
+    if (this.type === 'SHIELD') icon = '🛡️';
+    if (this.type === 'MEDKIT') icon = '❤️';
+
+    ctx.fillText(icon, 0, 0);
     ctx.restore();
   }
 }

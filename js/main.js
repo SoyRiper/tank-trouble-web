@@ -1,4 +1,4 @@
-﻿// Main Game Coordinator with Direct Vector Touch Joystick & Live Chat
+﻿// Main Game Coordinator with Multi-Touch Joystick, Laser Aim Sighting & Balanced Combat
 import { Sound } from './audio.js';
 import { Maze } from './maze.js';
 import { Tank } from './tank.js';
@@ -46,7 +46,7 @@ class Game {
 
     this._setupCanvas();
     this._setupInputs();
-    this._setupDirectVectorJoystick();
+    this._setupMultiTouchControls();
     this._setupUI();
     this._setupNetwork();
 
@@ -90,51 +90,58 @@ class Game {
     });
   }
 
-  _setupDirectVectorJoystick() {
+  _setupMultiTouchControls() {
     const base = document.getElementById('touch-joystick-base');
     const knob = document.getElementById('touch-joystick-knob');
     const fireBtn = document.getElementById('touch-btn-fire');
     if (!base || !knob) return;
 
-    let touchId = null;
+    let joystickTouchId = null;
     let baseRect = null;
     const maxRadius = 40;
 
-    const onTouchStart = (e) => {
+    // Joystick Touch Listeners (Independent touch tracking)
+    base.addEventListener('touchstart', (e) => {
       e.preventDefault();
       Sound.init();
-      const touch = e.changedTouches ? e.changedTouches[0] : e;
-      touchId = touch.identifier ?? 'mouse';
-      baseRect = base.getBoundingClientRect();
-      updateJoystick(touch.clientX, touch.clientY);
-    };
-
-    const onTouchMove = (e) => {
-      if (touchId === null) return;
-      e.preventDefault();
-      let touch = null;
-      if (e.changedTouches) {
-        for (let i = 0; i < e.changedTouches.length; i++) {
-          if (e.changedTouches[i].identifier === touchId) {
-            touch = e.changedTouches[i];
-            break;
-          }
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const touch = e.changedTouches[i];
+        if (joystickTouchId === null) {
+          joystickTouchId = touch.identifier;
+          baseRect = base.getBoundingClientRect();
+          updateJoystick(touch.clientX, touch.clientY);
+          break;
         }
-      } else {
-        touch = e;
       }
-      if (touch) {
-        updateJoystick(touch.clientX, touch.clientY);
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+      if (joystickTouchId === null) return;
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const touch = e.changedTouches[i];
+        if (touch.identifier === joystickTouchId) {
+          e.preventDefault();
+          updateJoystick(touch.clientX, touch.clientY);
+          break;
+        }
+      }
+    }, { passive: false });
+
+    const endJoystick = (e) => {
+      if (joystickTouchId === null) return;
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === joystickTouchId) {
+          joystickTouchId = null;
+          knob.style.transform = 'translate(0px, 0px)';
+          this.joystick.active = false;
+          this.joystick.power = 0;
+          break;
+        }
       }
     };
 
-    const onTouchEnd = (e) => {
-      if (touchId === null) return;
-      touchId = null;
-      knob.style.transform = 'translate(0px, 0px)';
-      this.joystick.active = false;
-      this.joystick.power = 0;
-    };
+    window.addEventListener('touchend', endJoystick, { passive: false });
+    window.addEventListener('touchcancel', endJoystick, { passive: false });
 
     const updateJoystick = (clientX, clientY) => {
       if (!baseRect) baseRect = base.getBoundingClientRect();
@@ -152,7 +159,7 @@ class Game {
 
       knob.style.transform = `translate(${dx}px, ${dy}px)`;
 
-      if (dist > 8) {
+      if (dist > 7) {
         this.joystick.active = true;
         this.joystick.targetAngle = Math.atan2(dy, dx);
         this.joystick.power = Math.min(1.0, dist / maxRadius);
@@ -162,32 +169,32 @@ class Game {
       }
     };
 
-    base.addEventListener('touchstart', onTouchStart, { passive: false });
-    window.addEventListener('touchmove', onTouchMove, { passive: false });
-    window.addEventListener('touchend', onTouchEnd, { passive: false });
-    window.addEventListener('touchcancel', onTouchEnd, { passive: false });
-
-    base.addEventListener('mousedown', onTouchStart);
-    window.addEventListener('mousemove', onTouchMove);
-    window.addEventListener('mouseup', onTouchEnd);
-
-    // Fire Button Touch
+    // Fire Button Multi-touch Listeners
     if (fireBtn) {
-      const startFire = (e) => {
+      fireBtn.addEventListener('touchstart', (e) => {
         e.preventDefault();
+        e.stopPropagation();
         Sound.init();
         this.joystick.shoot = true;
-      };
-      const endFire = (e) => {
+      }, { passive: false });
+
+      fireBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.joystick.shoot = false;
+      }, { passive: false });
+
+      fireBtn.addEventListener('touchcancel', (e) => {
         e.preventDefault();
         this.joystick.shoot = false;
-      };
+      }, { passive: false });
 
-      fireBtn.addEventListener('touchstart', startFire, { passive: false });
-      fireBtn.addEventListener('touchend', endFire, { passive: false });
-      fireBtn.addEventListener('touchcancel', endFire, { passive: false });
-      fireBtn.addEventListener('mousedown', startFire);
-      fireBtn.addEventListener('mouseup', endFire);
+      fireBtn.addEventListener('mousedown', (e) => {
+        Sound.init();
+        this.joystick.shoot = true;
+      });
+      fireBtn.addEventListener('mouseup', () => { this.joystick.shoot = false; });
+      fireBtn.addEventListener('mouseleave', () => { this.joystick.shoot = false; });
     }
   }
 
@@ -536,23 +543,20 @@ class Game {
         const isLocalControlled = (!this.isOnline && tank.id === 0) || (this.isOnline && tank.id === this.localPlayerIndex);
 
         if (isLocalControlled) {
-          // Keyboard Input (WASD / Arrows)
           if (this.keys['ArrowLeft'] || this.keys['KeyA']) steer -= 1;
           if (this.keys['ArrowRight'] || this.keys['KeyD']) steer += 1;
           if (this.keys['ArrowUp'] || this.keys['KeyW']) drive += 1;
           if (this.keys['ArrowDown'] || this.keys['KeyS']) drive -= 1;
           if (this.keys['KeyM'] || this.keys['Space'] || this.keys['KeyJ']) shoot = true;
 
-          // Direct Vector Joystick Input (Move smoothly towards finger angle!)
+          // Direct Vector Joystick Input
           if (this.joystick.active && this.joystick.power > 0.05) {
             let angleDiff = this.joystick.targetAngle - tank.rot;
             while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
             while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
 
-            // Steer towards target finger direction
             steer = Math.sign(angleDiff) * Math.min(1.0, Math.abs(angleDiff) * 5.5);
 
-            // Drive forward when roughly facing the target angle (< 95 deg)
             if (Math.abs(angleDiff) < 1.65) {
               drive = this.joystick.power * Math.cos(angleDiff);
             }
@@ -652,17 +656,25 @@ class Game {
       c.render(this.ctx);
     }
 
-    // 4. Tanks & Overhead Badges & Emotes
+    // 4. Laser Aim Sight for local player (Classic Tank Trouble Ricochet Prediction)
+    if (this.state === 'BATTLE') {
+      const localTank = this.tanks.find(t => t.id === (this.isOnline ? this.localPlayerIndex : 0));
+      if (localTank && !localTank.dead) {
+        localTank.renderLaserSight(this.ctx, this.maze);
+      }
+    }
+
+    // 5. Tanks & Overhead Badges & Emotes
     for (const t of this.tanks) {
       t.render(this.ctx);
     }
 
-    // 5. Projectiles
+    // 6. Projectiles
     for (const p of this.projectiles) {
       p.render(this.ctx);
     }
 
-    // 6. Particles
+    // 7. Particles
     this.particles.render(this.ctx);
 
     this.ctx.restore();

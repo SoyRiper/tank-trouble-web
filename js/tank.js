@@ -18,11 +18,11 @@ export class Tank {
     this.vx = 0;
     this.vy = 0;
 
-    this.maxSpeed = 200;
-    this.maxRevSpeed = 130;
-    this.accel = 920;
+    this.maxSpeed = 205;
+    this.maxRevSpeed = 135;
+    this.accel = 950;
     this.friction = 750;
-    this.turnSpeed = 4.4;
+    this.turnSpeed = 4.5;
 
     this.maxHp = 1000;
     this.hp = 1000;
@@ -121,7 +121,7 @@ export class Tank {
     // 1. Steering
     this.rot += steerInput * this.turnSpeed * dt;
 
-    // 2. Drive & Propulsion
+    // 2. Drive & Propulsion (Smooth, zero lockups while firing)
     const fwdX = Math.cos(this.rot);
     const fwdY = Math.sin(this.rot);
     let targetSpeed = 0;
@@ -199,20 +199,20 @@ export class Tank {
 
     const wConfig = WEAPON_TYPES[this.weapon];
     this.cooldown = wConfig.cooldown;
-    this.recoil = 5.5;
-    this.muzzleFlash = 0.07;
+    this.recoil = 4.0;
+    this.muzzleFlash = 0.06;
 
     switch (this.weapon) {
       case 'STANDARD':
         Sound.playShoot();
-        projectiles.push(new Bullet(this.id, muzzleX, muzzleY, fwdX, fwdY, 410, false, 50));
+        projectiles.push(new Bullet(this.id, muzzleX, muzzleY, fwdX, fwdY, 430, false, 150));
         break;
       case 'MINIGUN':
         Sound.playGatling();
         const spread = (Math.random() - 0.5) * 0.22;
         const sDirX = Math.cos(this.rot + spread);
         const sDirY = Math.sin(this.rot + spread);
-        projectiles.push(new Bullet(this.id, muzzleX, muzzleY, sDirX, sDirY, 500, true, 22));
+        projectiles.push(new Bullet(this.id, muzzleX, muzzleY, sDirX, sDirY, 520, true, 45));
         break;
       case 'HOMING_MISSILE':
         projectiles.push(new Missile(this.id, muzzleX, muzzleY, fwdX, fwdY));
@@ -228,11 +228,11 @@ export class Tank {
         break;
       case 'SHOTGUN':
         Sound.playShotgun();
-        for (let i = 0; i < 7; i++) {
-          const off = (i - 3) * 0.08 + (Math.random() - 0.5) * 0.04;
+        for (let i = 0; i < 9; i++) {
+          const off = (i - 4) * 0.07 + (Math.random() - 0.5) * 0.03;
           const px = Math.cos(this.rot + off);
           const py = Math.sin(this.rot + off);
-          projectiles.push(new Bullet(this.id, muzzleX, muzzleY, px, py, 400 + Math.random() * 60, false, 30));
+          projectiles.push(new Bullet(this.id, muzzleX, muzzleY, px, py, 430 + Math.random() * 60, false, 75));
         }
         break;
       case 'PLASMA_ORB':
@@ -257,7 +257,7 @@ export class Tank {
     }
   }
 
-  takeDamage(killerId, weaponName = 'Cannon', damageAmount = 50, isBank = false, particles = null) {
+  takeDamage(killerId, weaponName = 'Cannon', damageAmount = 150, isBank = false, particles = null) {
     if (this.dead) return;
 
     if (this.hasShield) {
@@ -297,6 +297,81 @@ export class Tank {
 
   _getAllTanks() {
     return window.activeGameTanks || [];
+  }
+
+  // Classic Tank Trouble Laser Aim Sight (Calculates first bounce trajectory line)
+  renderLaserSight(ctx, maze) {
+    if (this.dead) return;
+
+    const fwdX = Math.cos(this.rot);
+    const fwdY = Math.sin(this.rot);
+    let curX = this.x + fwdX * 22;
+    let curY = this.y + fwdY * 22;
+    let vx = fwdX;
+    let vy = fwdY;
+
+    ctx.save();
+    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = 1.4;
+    ctx.strokeStyle = this.color;
+    ctx.globalAlpha = 0.45;
+
+    let remainingDist = 650;
+    const maxBounces = 1;
+
+    for (let b = 0; b <= maxBounces; b++) {
+      let minT = remainingDist;
+      let hitNx = 0, hitNy = 0;
+      let nextX = curX + vx * remainingDist;
+      let nextY = curY + vy * remainingDist;
+
+      for (const w of maze.walls) {
+        const dx = nextX - curX, dy = nextY - curY;
+        const wdx = w.x2 - w.x1, wdy = w.y2 - w.y1;
+        const denom = dx * wdy - dy * wdx;
+        if (Math.abs(denom) < 0.0001) continue;
+
+        const t = ((w.x1 - curX) * wdy - (w.y1 - curY) * wdx) / denom;
+        const u = ((w.x1 - curX) * dy - (w.y1 - curY) * dx) / denom;
+
+        if (t > 0 && t < 1 && u >= 0 && u <= 1) {
+          const dist = Math.hypot(dx * t, dy * t);
+          if (dist < minT && dist > 1.0) {
+            minT = dist;
+            const wlen = Math.hypot(wdx, wdy);
+            const nx = -wdy / wlen, ny = wdx / wlen;
+            const dot = dx * nx + dy * ny;
+            hitNx = dot < 0 ? nx : -nx;
+            hitNy = dot < 0 ? ny : -ny;
+          }
+        }
+      }
+
+      const hitX = curX + vx * minT;
+      const hitY = curY + vy * minT;
+
+      ctx.beginPath();
+      ctx.moveTo(curX, curY);
+      ctx.lineTo(hitX, hitY);
+      ctx.stroke();
+
+      // Draw ricochet reticle dot
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      ctx.arc(hitX, hitY, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      remainingDist -= minT;
+      if (remainingDist <= 10 || (hitNx === 0 && hitNy === 0)) break;
+
+      const dot = vx * hitNx + vy * hitNy;
+      vx = vx - 2 * dot * hitNx;
+      vy = vy - 2 * dot * hitNy;
+      curX = hitX + hitNx * 2.0;
+      curY = hitY + hitNy * 2.0;
+    }
+
+    ctx.restore();
   }
 
   render(ctx) {
@@ -349,7 +424,7 @@ export class Tank {
       ctx.restore();
     }
 
-    // 5. Overhead Emote Speech Bubble (Crisp & High-Contrast for GG and Emojis)
+    // 5. Overhead Emote Speech Bubble
     if (this.emote) {
       ctx.save();
       const bubbleY = barY - (this.isAI && this.aiIntent ? 44 : 30);
@@ -357,7 +432,6 @@ export class Tank {
       const bubbleW = isText ? 32 : 26;
       const bubbleH = 22;
 
-      // Bubble Body
       ctx.fillStyle = '#FFFFFF';
       ctx.strokeStyle = '#1C1E21';
       ctx.lineWidth = 1.8;
@@ -366,7 +440,6 @@ export class Tank {
       ctx.fill();
       ctx.stroke();
 
-      // Bubble Tail
       ctx.fillStyle = '#FFFFFF';
       ctx.beginPath();
       ctx.moveTo(this.x - 3, bubbleY + bubbleH / 2 - 0.5);
@@ -383,7 +456,6 @@ export class Tank {
       ctx.lineTo(this.x + 3, bubbleY + bubbleH / 2 - 0.5);
       ctx.stroke();
 
-      // Render Emote / Text explicitly in Dark Color
       ctx.fillStyle = '#1C1E21';
       ctx.font = isText ? 'bold 12px "Space Grotesk", sans-serif' : '13px "Segoe UI Emoji", sans-serif';
       ctx.textAlign = 'center';
