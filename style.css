@@ -33,18 +33,23 @@ html, body {
   height: 100%;
   width: 100%;
   position: fixed;
-  touch-action: manipulation;
 }
 
-button, input, select, textarea {
+button {
   font-family: inherit;
   touch-action: manipulation;
   cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-input[type="text"] {
-  user-select: auto;
-  -webkit-user-select: auto;
+input, textarea {
+  font-family: inherit;
+  touch-action: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  cursor: text !important;
+  pointer-events: auto !important;
 }
 
 /* Screen Management */
@@ -69,7 +74,6 @@ input[type="text"] {
   max-width: 900px;
   margin: 0 auto;
   overflow-y: auto;
-  touch-action: manipulation;
 }
 
 .menu-header {
@@ -182,6 +186,10 @@ input[type="text"] {
   transition: all 0.15s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
   text-align: left;
+}
+
+.btn-menu-card * {
+  pointer-events: none;
 }
 
 .btn-menu-card:hover, .btn-menu-card:active {
@@ -387,9 +395,9 @@ canvas#gameCanvas {
   flex: 1;
   background: #fff;
   border: 1px solid var(--border-color);
-  padding: 4px 6px;
+  padding: 6px 8px;
   border-radius: 3px;
-  font-size: 10px;
+  font-size: 14px;
   font-family: var(--font-mono);
   outline: none;
 }
@@ -654,7 +662,6 @@ canvas#gameCanvas {
   z-index: 100;
   opacity: 0;
   pointer-events: none;
-  touch-action: manipulation;
   transition: opacity 0.2s ease;
 }
 
@@ -676,7 +683,7 @@ canvas#gameCanvas {
   gap: 12px;
   max-height: 90vh;
   overflow-y: auto;
-  touch-action: manipulation;
+  pointer-events: auto !important;
 }
 
 .modal-title {
@@ -783,13 +790,23 @@ canvas#gameCanvas {
 .join-input-row input {
   flex: 1;
   background: #fff;
-  border: 1px solid var(--border-color);
-  padding: 8px 10px;
+  border: 1.5px solid #1C1E21;
+  padding: 10px 12px;
   border-radius: 4px;
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 2px;
+  outline: none;
+  pointer-events: auto !important;
+  touch-action: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+.join-input-row input:focus {
+  border-color: var(--p1-red);
+  box-shadow: 0 0 0 2px rgba(217, 56, 58, 0.2);
 }
 
 /* Garage Workshop Styles */
@@ -838,13 +855,15 @@ canvas#gameCanvas {
 .input-group input {
   background: #fff;
   border: 1px solid var(--border-color);
-  padding: 5px 8px;
+  padding: 6px 8px;
   border-radius: 3px;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-main);
   outline: none;
+  pointer-events: auto !important;
+  touch-action: auto !important;
 }
 
 .options-box {

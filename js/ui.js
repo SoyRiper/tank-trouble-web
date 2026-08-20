@@ -1,4 +1,4 @@
-﻿// Universal UI & Touch Interaction Manager for Tank Trouble Web
+// Universal UI & Touch Interaction Manager for Tank Trouble Web
 import { COLOR_PALETTES, Customizer } from './customizer.js';
 import { Network } from './network.js';
 
@@ -238,6 +238,8 @@ export class UIManager {
     const contentCreate = document.getElementById('tab-content-create');
     const contentJoin = document.getElementById('tab-content-join');
 
+    const joinInput = document.getElementById('input-join-code');
+
     bindTap(tabCreate, () => {
       tabCreate.classList.add('active');
       tabJoin.classList.remove('active');
@@ -250,14 +252,32 @@ export class UIManager {
       tabCreate.classList.remove('active');
       contentJoin.classList.add('active');
       contentCreate.classList.remove('active');
+      if (joinInput) {
+        setTimeout(() => joinInput.focus(), 100);
+      }
     });
+
+    if (joinInput) {
+      joinInput.addEventListener('input', (e) => {
+        joinInput.value = e.target.value.toUpperCase();
+      });
+
+      joinInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const code = joinInput.value.trim().toUpperCase();
+          if (code) {
+            Network.joinRoom(code, Customizer);
+          }
+        }
+      });
+    }
 
     bindTap(document.getElementById('btn-action-create-room'), () => {
       Network.createRoom(Customizer, 1000);
     });
 
     bindTap(document.getElementById('btn-action-join-room'), () => {
-      const code = document.getElementById('input-join-code').value.trim();
+      const code = (joinInput ? joinInput.value : '').trim().toUpperCase();
       if (!code) {
         document.getElementById('join-error-msg').textContent = 'Por favor ingresa un código de 4 letras';
         return;
