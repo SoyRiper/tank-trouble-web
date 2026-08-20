@@ -44,7 +44,7 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 10px 4px;
+  padding: 4px 8px 4px;
 }
 
 .screen-view.active {
@@ -219,7 +219,7 @@ html, body {
   align-items: center;
   z-index: 10;
   flex-shrink: 0;
-  height: 40px;
+  height: 38px;
   gap: 4px;
 }
 
@@ -230,7 +230,7 @@ html, body {
 }
 
 .game-mini-title {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: -0.5px;
   white-space: nowrap;
@@ -238,7 +238,7 @@ html, body {
 
 .brand-badge {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 8.5px;
   background: var(--text-main);
   color: #fff;
   padding: 2px 4px;
@@ -256,9 +256,9 @@ html, body {
 .player-card {
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
-  padding: 2px 6px;
+  padding: 1px 5px;
   border-radius: 3px;
-  min-width: 60px;
+  min-width: 50px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -266,21 +266,21 @@ html, body {
 }
 
 .player-card .p-name {
-  font-size: 8px;
+  font-size: 7.5px;
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
 
 .player-card .p-score {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   font-family: var(--font-mono);
   line-height: 1.0;
 }
 
 .player-card .p-weapon {
-  font-size: 7px;
+  font-size: 6.5px;
   font-family: var(--font-mono);
   color: var(--text-muted);
   white-space: nowrap;
@@ -318,6 +318,8 @@ canvas#gameCanvas {
   display: block;
   max-width: 100%;
   max-height: 100%;
+  width: auto !important;
+  height: auto !important;
   object-fit: contain;
   aspect-ratio: 1120 / 660;
 }
@@ -392,7 +394,7 @@ canvas#gameCanvas {
 /* Quick Emotes Bar (Floating cleanly at top) */
 #emote-bar {
   position: absolute;
-  top: 8px;
+  top: 6px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -420,7 +422,7 @@ canvas#gameCanvas {
 }
 
 .emote-btn span {
-  font-size: 7.5px;
+  font-size: 7px;
   font-family: var(--font-mono);
   color: var(--text-muted);
 }
@@ -438,7 +440,7 @@ canvas#gameCanvas {
   display: none;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 12px 16px;
+  padding: 10px 14px;
   z-index: 30;
 }
 
@@ -453,8 +455,8 @@ canvas#gameCanvas {
 
 #touch-joystick-zone {
   pointer-events: auto;
-  width: 120px;
-  height: 120px;
+  width: 110px;
+  height: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -462,8 +464,8 @@ canvas#gameCanvas {
 }
 
 #touch-joystick-base {
-  width: 95px;
-  height: 95px;
+  width: 90px;
+  height: 90px;
   background: rgba(28, 30, 33, 0.55);
   border: 2px solid rgba(255, 255, 255, 0.7);
   border-radius: 50%;
@@ -476,8 +478,8 @@ canvas#gameCanvas {
 }
 
 #touch-joystick-knob {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   background: rgba(255, 255, 255, 0.98);
   border: 2px solid #1C1E21;
   border-radius: 50%;
@@ -491,17 +493,17 @@ canvas#gameCanvas {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .touch-fire-circle {
-  width: 78px;
-  height: 78px;
+  width: 74px;
+  height: 74px;
   background: rgba(217, 56, 58, 0.92);
   border: 2.5px solid #fff;
   border-radius: 50%;
   color: #fff;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.5px;
   display: flex;
@@ -520,11 +522,11 @@ canvas#gameCanvas {
 /* Kill Feed */
 #killfeed {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 6px;
+  right: 6px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   pointer-events: none;
   z-index: 15;
 }
@@ -532,10 +534,10 @@ canvas#gameCanvas {
 .kill-entry {
   background: rgba(255, 255, 255, 0.94);
   border: 1px solid var(--border-color);
-  padding: 3px 6px;
+  padding: 2px 5px;
   border-radius: 3px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
   color: var(--text-main);
   animation: slideFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -576,11 +578,11 @@ canvas#gameCanvas {
 #footer-bar {
   width: 100%;
   max-width: 1200px;
-  height: 30px;
+  height: 28px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 10px;
+  font-size: 9.5px;
   color: var(--text-muted);
   font-family: var(--font-mono);
   border-top: 1px solid var(--border-color);
@@ -595,11 +597,11 @@ canvas#gameCanvas {
 .btn-minimal {
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
-  padding: 4px 8px;
+  padding: 3px 6px;
   border-radius: 3px;
   color: var(--text-main);
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;

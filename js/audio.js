@@ -163,6 +163,10 @@ class WebAudioEngine {
     });
   }
 
+  playPowerup() {
+    this.playCrate();
+  }
+
   playShotgun() {
     if (!this.enabled) return;
     this.init();
