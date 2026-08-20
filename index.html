@@ -4,7 +4,37 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Tank Trouble — Modern Web 4.0</title>
-  <link rel="stylesheet" href="style.css?v=4.2.0">
+  <link rel="stylesheet" href="style.css?t=1724129700">
+  <script>
+    // Immediate Global Modal Actions (100% reliable before any modules load)
+    window.openModeModal = function() {
+      var m = document.getElementById('mode-modal');
+      if (m) m.classList.add('open');
+    };
+    window.openMultiplayerModal = function() {
+      var m = document.getElementById('multiplayer-modal');
+      if (m) m.classList.add('open');
+    };
+    window.openGarageModal = function() {
+      var m = document.getElementById('garage-modal');
+      if (m) m.classList.add('open');
+      if (window.Customizer && window.Customizer.initPreview) {
+        window.Customizer.initPreview('garagePreviewCanvas');
+      }
+    };
+    window.closeModeModal = function() {
+      var m = document.getElementById('mode-modal');
+      if (m) m.classList.remove('open');
+    };
+    window.closeMultiplayerModal = function() {
+      var m = document.getElementById('multiplayer-modal');
+      if (m) m.classList.remove('open');
+    };
+    window.closeGarageModal = function() {
+      var m = document.getElementById('garage-modal');
+      if (m) m.classList.remove('open');
+    };
+  </script>
 </head>
 <body>
 
@@ -26,12 +56,12 @@
         <canvas id="menuTankCanvas" width="200" height="200"></canvas>
       </div>
 
-      <button id="btn-menu-garage" class="btn-hero-garage" onclick="window.openGarageModal && window.openGarageModal()">🛠️ Personalizar Tanque (Garaje)</button>
+      <button id="btn-menu-garage" class="btn-hero-garage" onclick="window.openGarageModal()">🛠️ Personalizar Tanque (Garaje)</button>
     </div>
 
     <!-- Main Navigation Actions -->
     <div class="menu-action-grid">
-      <button id="btn-menu-singleplayer" class="btn-menu-card primary" onclick="window.openModeModal && window.openModeModal()">
+      <button id="btn-menu-singleplayer" class="btn-menu-card primary" onclick="window.openModeModal()">
         <div class="card-icon">🤖</div>
         <div class="card-text">
           <span class="title">JUGAR VS BOTS / LOCAL</span>
@@ -40,7 +70,7 @@
         <span class="arrow">➔</span>
       </button>
 
-      <button id="btn-menu-multiplayer" class="btn-menu-card accent" onclick="window.openMultiplayerModal && window.openMultiplayerModal()">
+      <button id="btn-menu-multiplayer" class="btn-menu-card accent" onclick="window.openMultiplayerModal()">
         <div class="card-icon">🌐</div>
         <div class="card-text">
           <span class="title">MULTIJUGADOR ONLINE</span>
@@ -91,7 +121,7 @@
       <div class="header-actions">
         <button id="btn-toggle-chat" class="btn-minimal" title="Abrir Chat">💬</button>
         <button id="btn-biome-toggle" class="btn-minimal" title="Cambiar Bioma">🗺️</button>
-        <button id="btn-in-game-garage" class="btn-minimal" title="Personalizar Tanque" onclick="window.openGarageModal && window.openGarageModal()">🛠️</button>
+        <button id="btn-in-game-garage" class="btn-minimal" title="Personalizar Tanque" onclick="window.openGarageModal()">🛠️</button>
         <button id="btn-return-menu" class="btn-minimal btn-danger" title="Salir al Menú">🚪 Salir</button>
       </div>
     </header>
@@ -166,7 +196,7 @@
     <div class="modal-panel">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h2 class="modal-title">🌐 Multijugador Online</h2>
-        <button class="btn-minimal" onclick="window.closeMultiplayerModal && window.closeMultiplayerModal()">✕</button>
+        <button class="btn-minimal" onclick="window.closeMultiplayerModal()">✕</button>
       </div>
 
       <!-- Tabs -->
@@ -215,7 +245,7 @@
       </div>
 
       <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
-        <button id="btn-close-mp-modal" class="btn-minimal" onclick="window.closeMultiplayerModal && window.closeMultiplayerModal()">Volver</button>
+        <button id="btn-close-mp-modal" class="btn-minimal" onclick="window.closeMultiplayerModal()">Volver</button>
       </div>
     </div>
   </div>
@@ -226,7 +256,7 @@
     <div class="modal-panel">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h2 class="modal-title">Seleccionar Modo de Batalla</h2>
-        <button class="btn-minimal" onclick="window.closeModeModal && window.closeModeModal()">✕</button>
+        <button class="btn-minimal" onclick="window.closeModeModal()">✕</button>
       </div>
       <div class="mode-grid">
         <button class="mode-btn" data-mode="1p_ai">
@@ -247,7 +277,7 @@
         </button>
       </div>
       <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
-        <button id="btn-close-mode-modal" class="btn-minimal" onclick="window.closeModeModal && window.closeModeModal()">Cancelar</button>
+        <button id="btn-close-mode-modal" class="btn-minimal" onclick="window.closeModeModal()">Cancelar</button>
       </div>
     </div>
   </div>
@@ -258,7 +288,7 @@
     <div class="modal-panel" style="max-width: 600px;">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h2 class="modal-title">🛠️ Garaje y Personalización</h2>
-        <button class="btn-minimal" onclick="window.closeGarageModal && window.closeGarageModal()">✕</button>
+        <button class="btn-minimal" onclick="window.closeGarageModal()">✕</button>
       </div>
 
       <div class="garage-layout">
@@ -301,6 +331,6 @@
   </div>
 
   <!-- Scripts with Cache Buster -->
-  <script type="module" src="js/main.js?v=4.2.0"></script>
+  <script type="module" src="js/main.js?t=1724129700"></script>
 </body>
 </html>

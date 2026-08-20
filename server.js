@@ -1,4 +1,4 @@
-﻿// Full-Stack Production Server for Tank Trouble Web (Static Files + WebSockets)
+// Full-Stack Production Server for Tank Trouble Web (Static Files + WebSockets)
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -23,6 +23,10 @@ const server = http.createServer((req, res) => {
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
   fs.readFile(filePath, (err, content) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
     if (err) {
       if (err.code === 'ENOENT') {
         fs.readFile(path.join(__dirname, 'index.html'), (err2, indexContent) => {
