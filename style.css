@@ -1,4 +1,4 @@
-﻿/* Nordic Minimalist & Editorial UI for Tank Trouble Web - Responsive Touch & Click */
+﻿/* Nordic Minimalist & Editorial UI for Tank Trouble Web - Clean Display State & Zero Click Interception */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
 
 :root {
@@ -32,7 +32,8 @@ html, body {
   overflow: hidden;
   height: 100%;
   width: 100%;
-  position: fixed;
+  margin: 0;
+  padding: 0;
 }
 
 button {
@@ -650,24 +651,20 @@ canvas#gameCanvas {
   border-color: #D9383A;
 }
 
-/* Modals */
+/* Modals (Explicit Display None / Flex to Guarantee Zero Click Blocking) */
 .modal-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(28, 30, 33, 0.55);
   backdrop-filter: blur(4px);
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   z-index: 100;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
 }
 
 .modal-backdrop.open {
-  opacity: 1;
-  pointer-events: auto;
+  display: flex !important;
 }
 
 .modal-panel {
@@ -683,7 +680,6 @@ canvas#gameCanvas {
   gap: 12px;
   max-height: 90vh;
   overflow-y: auto;
-  pointer-events: auto !important;
 }
 
 .modal-title {
@@ -798,10 +794,6 @@ canvas#gameCanvas {
   font-weight: 700;
   letter-spacing: 2px;
   outline: none;
-  pointer-events: auto !important;
-  touch-action: auto !important;
-  user-select: text !important;
-  -webkit-user-select: text !important;
 }
 
 .join-input-row input:focus {
@@ -862,8 +854,6 @@ canvas#gameCanvas {
   font-weight: 600;
   color: var(--text-main);
   outline: none;
-  pointer-events: auto !important;
-  touch-action: auto !important;
 }
 
 .options-box {
