@@ -1,0 +1,296 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Tank Trouble — Modern Web 4.0</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ================= SCREEN 1: MAIN MENU ================= -->
+  <div id="screen-main-menu" class="screen-view active">
+    <div class="menu-header">
+      <h1 class="game-logo">TANK TROUBLE</h1>
+      <span class="game-sub">EDICIÓN WEB 4.0 MULTIJUGADOR ONLINE</span>
+    </div>
+
+    <!-- Center Tank Showcase & Pilot Tag -->
+    <div class="main-showcase">
+      <div class="pilot-badge-plate">
+        <label>PILOTO:</label>
+        <input type="text" id="menu-pilot-input" maxlength="14" value="COMANDANTE" placeholder="TU NOMBRE">
+      </div>
+
+      <div class="tank-pod-platform">
+        <canvas id="menuTankCanvas" width="200" height="200"></canvas>
+      </div>
+
+      <button id="btn-menu-garage" class="btn-hero-garage">🛠️ Personalizar Tanque (Garaje)</button>
+    </div>
+
+    <!-- Main Navigation Actions -->
+    <div class="menu-action-grid">
+      <button id="btn-menu-singleplayer" class="btn-menu-card primary">
+        <div class="card-icon">🤖</div>
+        <div class="card-text">
+          <span class="title">JUGAR VS BOTS / LOCAL</span>
+          <span class="desc">1P vs Laika (AI), 2P Local, 3P o Caos Total FFA</span>
+        </div>
+        <span class="arrow">➔</span>
+      </button>
+
+      <button id="btn-menu-multiplayer" class="btn-menu-card accent">
+        <div class="card-icon">🌐</div>
+        <div class="card-text">
+          <span class="title">MULTIJUGADOR ONLINE</span>
+          <span class="desc">Crear o Unirse a Salas con Código Privado</span>
+        </div>
+        <span class="arrow">➔</span>
+      </button>
+    </div>
+
+    <div class="menu-footer">
+      <span>WASD / Flechas + Espacio / M | Joystick Táctil en Móvil</span>
+    </div>
+  </div>
+
+
+  <!-- ================= SCREEN 2: IN-GAME BATTLE VIEW ================= -->
+  <div id="screen-game-battle" class="screen-view">
+    <!-- Top Header Bar -->
+    <header id="header-bar">
+      <div class="header-left">
+        <span class="game-mini-title">TANK TROUBLE</span>
+        <span class="brand-badge" id="online-room-badge" style="display:none;">SALA: ----</span>
+      </div>
+
+      <div id="scoreboard">
+        <div id="card-p1" class="player-card p1-card">
+          <span class="p-name" id="name-p1">P1</span>
+          <span class="p-score" id="score-p1">0</span>
+          <span class="p-weapon" id="weapon-p1">Cannon [∞] • 1000</span>
+        </div>
+        <div id="card-p2" class="player-card p2-card">
+          <span class="p-name" id="name-p2">P2</span>
+          <span class="p-score" id="score-p2">0</span>
+          <span class="p-weapon" id="weapon-p2">Cannon [∞] • 1000</span>
+        </div>
+        <div id="card-p3" class="player-card p3-card" style="display:none;">
+          <span class="p-name" id="name-p3">P3</span>
+          <span class="p-score" id="score-p3">0</span>
+          <span class="p-weapon" id="weapon-p3">Cannon [∞] • 1000</span>
+        </div>
+        <div id="card-p4" class="player-card p4-card">
+          <span class="p-name" id="name-p4">LAIKA</span>
+          <span class="p-score" id="score-p4">0</span>
+          <span class="p-weapon" id="weapon-p4">Cannon [∞] • 1000</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="btn-toggle-chat" class="btn-minimal" title="Abrir Chat">💬</button>
+        <button id="btn-biome-toggle" class="btn-minimal" title="Cambiar Bioma">🗺️</button>
+        <button id="btn-in-game-garage" class="btn-minimal" title="Personalizar Tanque">🛠️</button>
+        <button id="btn-return-menu" class="btn-minimal btn-danger" title="Salir al Menú">🚪 Salir</button>
+      </div>
+    </header>
+
+    <!-- Game Canvas Viewport & Touch Controls -->
+    <main id="game-container">
+      <canvas id="gameCanvas" width="1120" height="660"></canvas>
+      
+      <!-- Kill Feed -->
+      <div id="killfeed"></div>
+
+      <!-- Center Banner -->
+      <div id="banner-overlay" style="opacity: 0;">
+        <h1 id="banner-title">ROUND 1</h1>
+        <p id="banner-sub">PREPARE FOR BATTLE</p>
+      </div>
+
+      <!-- In-Game Live Chat Floating Overlay -->
+      <div id="game-chat-box">
+        <div id="chat-messages-list"></div>
+        <div class="chat-input-row">
+          <input type="text" id="chat-text-input" placeholder="Escribe un mensaje..." maxlength="60">
+          <button id="btn-send-chat">Enviar</button>
+        </div>
+      </div>
+
+      <!-- Quick Emotes Bar -->
+      <div id="emote-bar">
+        <button class="emote-btn" data-emote="🎯"><span>[1]</span> 🎯</button>
+        <button class="emote-btn" data-emote="🔥"><span>[2]</span> 🔥</button>
+        <button class="emote-btn" data-emote="💀"><span>[3]</span> 💀</button>
+        <button class="emote-btn" data-emote="🛡️"><span>[4]</span> 🛡️</button>
+        <button class="emote-btn" data-emote="😂"><span>[5]</span> 😂</button>
+        <button class="emote-btn" data-emote="GG"><span>[6]</span> GG</button>
+      </div>
+
+      <!-- Mobile Touch Controls: Analog Joystick & Fire Button -->
+      <div id="touch-controls-layer">
+        <!-- Left Touch Analog Joystick -->
+        <div id="touch-joystick-zone">
+          <div id="touch-joystick-base">
+            <div id="touch-joystick-knob"></div>
+          </div>
+        </div>
+
+        <!-- Right Touch Action Buttons -->
+        <div id="touch-actions-zone">
+          <button id="touch-btn-fire" class="touch-fire-circle">
+            <span>💥 FUEGO</span>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Controls Bar (Hidden on mobile) -->
+    <footer id="footer-bar">
+      <div class="controls-hint">
+        <span>Controles:</span> WASD / Flechas + Espacio / M &nbsp;|&nbsp;
+        <span>Emotes:</span> Teclas 1 al 6 &nbsp;|&nbsp;
+        <span>Móvil:</span> Joystick Táctil
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button id="btn-audio-toggle" class="btn-minimal">🔊 Audio: ON</button>
+        <button id="btn-restart" class="btn-minimal">Reiniciar</button>
+      </div>
+    </footer>
+  </div>
+
+
+  <!-- ================= MODAL: MULTIPLAYER ONLINE HUB ================= -->
+  <div id="multiplayer-modal" class="modal-backdrop">
+    <div class="modal-panel" style="max-width: 540px;">
+      <h2 class="modal-title">🌐 Multijugador Online</h2>
+
+      <div class="mp-tabs">
+        <button id="tab-btn-create" class="tab-btn active">Crear Sala (Host)</button>
+        <button id="tab-btn-join" class="tab-btn">Unirse con Código</button>
+      </div>
+
+      <!-- Tab Content: Host / Create Room & Live Room Lobby -->
+      <div id="tab-content-create" class="mp-tab-content active">
+        <div class="host-config-box">
+          <p style="font-size: 12px; color: var(--text-muted);">Crea una sala privada y comparte el código de 4 letras con tus amigos:</p>
+          <button id="btn-action-create-room" class="btn-action-large">🚀 Crear Sala Privada</button>
+        </div>
+
+        <!-- Real-time Lobby View once created or joined -->
+        <div id="host-lobby-view" style="display: none; margin-top: 14px;">
+          <div class="room-code-badge">
+            <span>CÓDIGO DE SALA:</span>
+            <strong id="display-room-code">----</strong>
+            <button id="btn-copy-code" class="btn-minimal">📋 Copiar</button>
+          </div>
+
+          <!-- Status message for guests -->
+          <div id="guest-waiting-msg" style="display: none; background: #E8F8F5; border: 1px solid #A3E4D7; color: #16A085; padding: 8px 12px; border-radius: 4px; font-size: 12px; margin-top: 10px;">
+            ⏳ <strong>Conectado a la sala.</strong> Esperando a que el anfitrión inicie la partida...
+          </div>
+
+          <label class="section-label" style="margin-top: 12px; display: block;">Jugadores en la Sala (<span id="lobby-player-count">1</span>/4):</label>
+          <div id="lobby-players-grid" class="lobby-grid"></div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+            <button id="btn-host-start-game" class="btn-action-large" style="background: #27AE60;">¡INICIAR PARTIDA!</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content: Join Room -->
+      <div id="tab-content-join" class="mp-tab-content">
+        <p style="font-size: 12px; color: var(--text-muted);">Introduce el código de sala de 4 letras que te dio el anfitrión:</p>
+        <div class="join-input-row" style="margin-top: 10px;">
+          <input type="text" id="input-join-code" maxlength="4" placeholder="CÓDIGO (EJ: TANK)" style="text-transform: uppercase;">
+          <button id="btn-action-join-room" class="btn-action-large" style="margin: 0;">Entrar</button>
+        </div>
+        <div id="join-error-msg" style="color: #E74C3C; font-size: 11px; margin-top: 6px; font-weight: 600;"></div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+        <button id="btn-close-mp-modal" class="btn-minimal">Volver</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= MODAL: LOCAL / BOT MODE SELECTOR ================= -->
+  <div id="mode-modal" class="modal-backdrop">
+    <div class="modal-panel">
+      <h2 class="modal-title">Selecciona el Modo Local</h2>
+      <div class="mode-grid">
+        <button class="mode-btn" data-mode="1p_ai">
+          <span>1 Jugador vs Laika (IA Sniper)</span>
+          <span>➔</span>
+        </button>
+        <button class="mode-btn" data-mode="2p">
+          <span>2 Jugadores (1 vs 1 Local)</span>
+          <span>➔</span>
+        </button>
+        <button class="mode-btn" data-mode="3p">
+          <span>3 Jugadores (Todos contra Todos)</span>
+          <span>➔</span>
+        </button>
+        <button class="mode-btn chaos" data-mode="chaos_ffa">
+          <span>⚡ Caos Total (4 Tanques FFA: Laika, Ares, Nexus) ⚡</span>
+          <span>➔</span>
+        </button>
+      </div>
+      <button id="btn-close-mode-modal" class="btn-minimal" style="align-self: flex-end;">Cerrar</button>
+    </div>
+  </div>
+
+
+  <!-- ================= MODAL: TANK GARAGE CUSTOMIZER ================= -->
+  <div id="garage-modal" class="modal-backdrop">
+    <div class="modal-panel" style="max-width: 650px;">
+      <h2 class="modal-title">🛠️ Taller de Personalización del Tanque</h2>
+      
+      <div class="garage-layout">
+        <!-- Live 360 Preview -->
+        <div class="preview-box">
+          <canvas id="garagePreviewCanvas" width="180" height="180"></canvas>
+          <div class="input-group">
+            <label>Nombre del Piloto:</label>
+            <input type="text" id="pilot-name-input" maxlength="14" placeholder="COMANDANTE" value="COMANDANTE">
+          </div>
+        </div>
+
+        <!-- Customization Options -->
+        <div class="options-box">
+          <label class="section-label">Modelo de Chasis:</label>
+          <div class="chassis-selector">
+            <button class="chassis-btn active" data-chassis="classic">Clásico Mk-I</button>
+            <button class="chassis-btn" data-chassis="heavy">Behemoth Blindado</button>
+            <button class="chassis-btn" data-chassis="hover">Hovercraft</button>
+            <button class="chassis-btn" data-chassis="railgun">Mecha Railgun</button>
+          </div>
+
+          <label class="section-label" style="margin-top: 10px;">Color del Chasis:</label>
+          <div class="color-palette" id="color-palette-container"></div>
+
+          <label class="section-label" style="margin-top: 10px;">Calcomanías y Ribetes:</label>
+          <div class="decal-selector">
+            <button class="decal-btn" data-decal="none">Ninguno</button>
+            <button class="decal-btn active" data-decal="stripes">Rayas Blancas</button>
+            <button class="decal-btn" data-decal="gold_trim">Ribete Oro</button>
+            <button class="decal-btn" data-decal="star">Estrella</button>
+            <button class="decal-btn" data-decal="hazard">Peligro</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+        <span style="font-size: 11px; color: var(--text-muted);">* Se guarda automáticamente en tu navegador.</span>
+        <button id="btn-save-garage" class="btn-minimal" style="background: #1C1E21; color: #fff;">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

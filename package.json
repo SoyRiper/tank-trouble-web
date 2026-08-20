@@ -1,0 +1,12 @@
+﻿{
+  "name": "tank-trouble-web",
+  "version": "4.0.0",
+  "description": "Modern Web 4.0 Tank Trouble with Online Multiplayer Rooms",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
