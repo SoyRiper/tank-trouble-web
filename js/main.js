@@ -1,4 +1,4 @@
-﻿// Main Game Coordinator with Pro Dynamic Floating Joystick, Multi-Touch & Auto-Rapid Fire
+// Main Game Coordinator with Pro Dynamic Floating Joystick, Multi-Touch & Auto-Rapid Fire
 import { Sound } from './audio.js';
 import { Maze } from './maze.js';
 import { Tank } from './tank.js';
@@ -167,7 +167,7 @@ class Game {
       for (let i = 0; i < e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
         if (touch.identifier === joystickTouchId) {
-          e.preventDefault();
+          if (e.cancelable) e.preventDefault();
           joystickTouchId = null;
           joystickKnob.style.transform = 'translate(0px, 0px)';
           joystickBase.style.transform = 'scale(1.0)';
@@ -180,14 +180,14 @@ class Game {
 
     joystickZone.addEventListener('touchstart', onJoystickTouchStart, { passive: false });
     window.addEventListener('touchmove', onJoystickTouchMove, { passive: false });
-    window.addEventListener('touchend', onJoystickTouchEnd, { passive: false });
-    window.addEventListener('touchcancel', onJoystickTouchEnd, { passive: false });
+    window.addEventListener('touchend', onJoystickTouchEnd);
+    window.addEventListener('touchcancel', onJoystickTouchEnd);
 
     // B) Right Touch Fire Zone (100% Reliable Multi-Touch)
     let fireTouchId = null;
 
     const startFire = (e) => {
-      e.preventDefault();
+      if (e.cancelable) e.preventDefault();
       Sound.init();
       if (e.changedTouches) {
         fireTouchId = e.changedTouches[0].identifier;
@@ -197,7 +197,7 @@ class Game {
     };
 
     const endFire = (e) => {
-      e.preventDefault();
+      if (e.cancelable) e.preventDefault();
       if (e.changedTouches && fireTouchId !== null) {
         for (let i = 0; i < e.changedTouches.length; i++) {
           if (e.changedTouches[i].identifier === fireTouchId) {
@@ -215,8 +215,8 @@ class Game {
 
     if (fireZone) {
       fireZone.addEventListener('touchstart', startFire, { passive: false });
-      window.addEventListener('touchend', endFire, { passive: false });
-      window.addEventListener('touchcancel', endFire, { passive: false });
+      window.addEventListener('touchend', endFire);
+      window.addEventListener('touchcancel', endFire);
 
       fireZone.addEventListener('mousedown', startFire);
       window.addEventListener('mouseup', endFire);
