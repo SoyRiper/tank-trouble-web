@@ -4,29 +4,6 @@ import { Network } from './network.js';
 
 export function bindTap(el, callback) {
   if (!el) return;
-  let startX = 0, startY = 0, moved = false;
-
-  el.addEventListener('touchstart', (e) => {
-    moved = false;
-    const touch = e.touches[0];
-    startX = touch.clientX;
-    startY = touch.clientY;
-  }, { passive: true });
-
-  el.addEventListener('touchmove', (e) => {
-    const touch = e.touches[0];
-    if (Math.hypot(touch.clientX - startX, touch.clientY - startY) > 10) {
-      moved = true;
-    }
-  }, { passive: true });
-
-  el.addEventListener('touchend', (e) => {
-    if (!moved) {
-      if (e.cancelable) e.preventDefault();
-      callback(e);
-    }
-  });
-
   el.addEventListener('click', (e) => {
     callback(e);
   });
@@ -122,6 +99,10 @@ export class UIManager {
     bindTap(document.getElementById('btn-in-game-garage'), () => {
       this.garageModal.classList.add('open');
       Customizer.initPreview('garagePreviewCanvas');
+    });
+
+    document.querySelectorAll('.modal-panel').forEach(panel => {
+      panel.addEventListener('click', (e) => e.stopPropagation());
     });
 
     bindTap(document.getElementById('btn-close-mode-modal'), () => {
