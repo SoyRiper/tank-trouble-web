@@ -5,7 +5,7 @@ import { Tank } from './tank.js';
 import { AIBot } from './ai.js';
 import { ParticleSystem } from './particles.js';
 import { Crate, Bullet, Missile, LaserBeam, FragBomb, Landmine, PlasmaOrb } from './weapons.js';
-import { UIManager, bindTap } from './ui.js';
+import { UIManager } from './ui.js';
 import { Customizer } from './customizer.js';
 import { ChaosEvents } from './events.js';
 import { Network } from './network.js';
@@ -83,10 +83,10 @@ class Game {
     });
 
     document.querySelectorAll('.emote-btn').forEach((btn) => {
-      bindTap(btn, () => {
+      btn.onclick = () => {
         const emote = btn.dataset.emote;
         this._triggerLocalEmote(emote);
-      });
+      };
     });
   }
 
@@ -235,26 +235,26 @@ class Game {
 
   _setupUI() {
     document.querySelectorAll('.mode-btn').forEach((btn) => {
-      bindTap(btn, () => {
+      btn.onclick = () => {
         const mode = btn.dataset.mode;
         this.isOnline = false;
         this._setMode(mode);
         this.ui.modeModal.classList.remove('open');
         this.ui.showScreen('BATTLE');
-      });
+      };
     });
 
-    bindTap(document.getElementById('btn-biome-toggle'), () => {
+    document.getElementById('btn-biome-toggle').onclick = () => {
       const nextBiome = this.maze.cycleBiome();
       this.ui.updateBiomeButton(nextBiome);
       this.ui.showBanner(`MAPA: ${nextBiome.name.toUpperCase()}`, '', 1.2);
-    });
+    };
 
-    bindTap(document.getElementById('btn-return-menu'), () => {
+    document.getElementById('btn-return-menu').onclick = () => {
       this.state = 'MENU';
       this.isOnline = false;
       this.ui.showScreen('MENU');
-    });
+    };
 
     this.ui.onGarageSaved = () => {
       const p1 = this.tanks.find(t => t.id === 0);
@@ -273,16 +273,16 @@ class Game {
     };
 
     const audioBtn = document.getElementById('btn-audio-toggle');
-    bindTap(audioBtn, () => {
+    audioBtn.onclick = () => {
       Sound.enabled = !Sound.enabled;
       audioBtn.textContent = Sound.enabled ? '🔊 Audio: ON' : '🔇 Audio: OFF';
-    });
+    };
 
-    bindTap(document.getElementById('btn-restart'), () => {
+    document.getElementById('btn-restart').onclick = () => {
       if (!this.isOnline) {
         this._initMatch();
       }
-    });
+    };
   }
 
   _setupNetwork() {

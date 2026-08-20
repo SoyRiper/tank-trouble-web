@@ -4,37 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Tank Trouble — Modern Web 4.0</title>
-  <link rel="stylesheet" href="style.css?t=1724129700">
-  <script>
-    // Immediate Global Modal Actions (100% reliable before any modules load)
-    window.openModeModal = function() {
-      var m = document.getElementById('mode-modal');
-      if (m) m.classList.add('open');
-    };
-    window.openMultiplayerModal = function() {
-      var m = document.getElementById('multiplayer-modal');
-      if (m) m.classList.add('open');
-    };
-    window.openGarageModal = function() {
-      var m = document.getElementById('garage-modal');
-      if (m) m.classList.add('open');
-      if (window.Customizer && window.Customizer.initPreview) {
-        window.Customizer.initPreview('garagePreviewCanvas');
-      }
-    };
-    window.closeModeModal = function() {
-      var m = document.getElementById('mode-modal');
-      if (m) m.classList.remove('open');
-    };
-    window.closeMultiplayerModal = function() {
-      var m = document.getElementById('multiplayer-modal');
-      if (m) m.classList.remove('open');
-    };
-    window.closeGarageModal = function() {
-      var m = document.getElementById('garage-modal');
-      if (m) m.classList.remove('open');
-    };
-  </script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -56,12 +26,12 @@
         <canvas id="menuTankCanvas" width="200" height="200"></canvas>
       </div>
 
-      <button id="btn-menu-garage" class="btn-hero-garage" onclick="window.openGarageModal()">🛠️ Personalizar Tanque (Garaje)</button>
+      <button id="btn-menu-garage" class="btn-hero-garage">🛠️ Personalizar Tanque (Garaje)</button>
     </div>
 
     <!-- Main Navigation Actions -->
     <div class="menu-action-grid">
-      <button id="btn-menu-singleplayer" class="btn-menu-card primary" onclick="window.openModeModal()">
+      <button id="btn-menu-singleplayer" class="btn-menu-card primary">
         <div class="card-icon">🤖</div>
         <div class="card-text">
           <span class="title">JUGAR VS BOTS / LOCAL</span>
@@ -70,7 +40,7 @@
         <span class="arrow">➔</span>
       </button>
 
-      <button id="btn-menu-multiplayer" class="btn-menu-card accent" onclick="window.openMultiplayerModal()">
+      <button id="btn-menu-multiplayer" class="btn-menu-card accent">
         <div class="card-icon">🌐</div>
         <div class="card-text">
           <span class="title">MULTIJUGADOR ONLINE</span>
@@ -121,7 +91,7 @@
       <div class="header-actions">
         <button id="btn-toggle-chat" class="btn-minimal" title="Abrir Chat">💬</button>
         <button id="btn-biome-toggle" class="btn-minimal" title="Cambiar Bioma">🗺️</button>
-        <button id="btn-in-game-garage" class="btn-minimal" title="Personalizar Tanque" onclick="window.openGarageModal()">🛠️</button>
+        <button id="btn-in-game-garage" class="btn-minimal" title="Personalizar Tanque">🛠️</button>
         <button id="btn-return-menu" class="btn-minimal btn-danger" title="Salir al Menú">🚪 Salir</button>
       </div>
     </header>
@@ -193,13 +163,9 @@
 
   <!-- ================= MODAL: MULTIPLAYER ONLINE HUB ================= -->
   <div id="multiplayer-modal" class="modal-backdrop">
-    <div class="modal-panel">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 class="modal-title">🌐 Multijugador Online</h2>
-        <button class="btn-minimal" onclick="window.closeMultiplayerModal()">✕</button>
-      </div>
+    <div class="modal-panel" style="max-width: 540px;">
+      <h2 class="modal-title">🌐 Multijugador Online</h2>
 
-      <!-- Tabs -->
       <div class="mp-tabs">
         <button id="tab-btn-create" class="tab-btn active">Crear Sala (Host)</button>
         <button id="tab-btn-join" class="tab-btn">Unirse con Código</button>
@@ -238,74 +204,68 @@
       <div id="tab-content-join" class="mp-tab-content">
         <p style="font-size: 12px; color: var(--text-muted);">Introduce el código de sala de 4 letras que te dio el anfitrión:</p>
         <div class="join-input-row" style="margin-top: 10px;">
-          <input type="text" id="input-join-code" maxlength="4" placeholder="CÓDIGO (EJ: TANK)" style="text-transform: uppercase;" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" inputmode="text">
+          <input type="text" id="input-join-code" maxlength="4" placeholder="CÓDIGO (EJ: TANK)" style="text-transform: uppercase;">
           <button id="btn-action-join-room" class="btn-action-large" style="margin: 0;">Entrar</button>
         </div>
         <div id="join-error-msg" style="color: #E74C3C; font-size: 11px; margin-top: 6px; font-weight: 600;"></div>
       </div>
 
       <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
-        <button id="btn-close-mp-modal" class="btn-minimal" onclick="window.closeMultiplayerModal()">Volver</button>
+        <button id="btn-close-mp-modal" class="btn-minimal">Volver</button>
       </div>
     </div>
   </div>
 
 
-  <!-- ================= MODAL: GAME MODE SELECTOR ================= -->
+  <!-- ================= MODAL: LOCAL / BOT MODE SELECTOR ================= -->
   <div id="mode-modal" class="modal-backdrop">
     <div class="modal-panel">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 class="modal-title">Seleccionar Modo de Batalla</h2>
-        <button class="btn-minimal" onclick="window.closeModeModal()">✕</button>
-      </div>
+      <h2 class="modal-title">Selecciona el Modo Local</h2>
       <div class="mode-grid">
         <button class="mode-btn" data-mode="1p_ai">
-          <span>🤖 1 Jugador vs Laika (IA Táctica)</span>
-          <span class="tag">SOLO</span>
+          <span>1 Jugador vs Laika (IA Sniper)</span>
+          <span>➔</span>
         </button>
         <button class="mode-btn" data-mode="2p">
-          <span>👥 2 Jugadores (1v1 Local)</span>
-          <span class="tag">DUEL</span>
+          <span>2 Jugadores (1 vs 1 Local)</span>
+          <span>➔</span>
         </button>
         <button class="mode-btn" data-mode="3p">
-          <span>👥 3 Jugadores (Local)</span>
-          <span class="tag">TRIO</span>
+          <span>3 Jugadores (Todos contra Todos)</span>
+          <span>➔</span>
         </button>
         <button class="mode-btn chaos" data-mode="chaos_ffa">
-          <span>🔥 Caos Total FFA (4 Tanques + IA)</span>
-          <span class="tag" style="background:#E67E22; color:#fff;">CAOS</span>
+          <span>⚡ Caos Total (4 Tanques FFA: Laika, Ares, Nexus) ⚡</span>
+          <span>➔</span>
         </button>
       </div>
-      <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
-        <button id="btn-close-mode-modal" class="btn-minimal" onclick="window.closeModeModal()">Cancelar</button>
-      </div>
+      <button id="btn-close-mode-modal" class="btn-minimal" style="align-self: flex-end;">Cerrar</button>
     </div>
   </div>
 
 
-  <!-- ================= MODAL: GARAGE & CUSTOMIZER ================= -->
+  <!-- ================= MODAL: TANK GARAGE CUSTOMIZER ================= -->
   <div id="garage-modal" class="modal-backdrop">
-    <div class="modal-panel" style="max-width: 600px;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 class="modal-title">🛠️ Garaje y Personalización</h2>
-        <button class="btn-minimal" onclick="window.closeGarageModal()">✕</button>
-      </div>
-
+    <div class="modal-panel" style="max-width: 650px;">
+      <h2 class="modal-title">🛠️ Taller de Personalización del Tanque</h2>
+      
       <div class="garage-layout">
+        <!-- Live 360 Preview -->
         <div class="preview-box">
-          <canvas id="garagePreviewCanvas" width="160" height="160"></canvas>
+          <canvas id="garagePreviewCanvas" width="180" height="180"></canvas>
           <div class="input-group">
-            <label>Nombre de Piloto:</label>
-            <input type="text" id="pilot-name-input" maxlength="14" value="COMANDANTE">
+            <label>Nombre del Piloto:</label>
+            <input type="text" id="pilot-name-input" maxlength="14" placeholder="COMANDANTE" value="COMANDANTE">
           </div>
         </div>
 
+        <!-- Customization Options -->
         <div class="options-box">
           <label class="section-label">Modelo de Chasis:</label>
           <div class="chassis-selector">
             <button class="chassis-btn active" data-chassis="classic">Clásico Mk-I</button>
             <button class="chassis-btn" data-chassis="heavy">Behemoth Blindado</button>
-            <button class="chassis-btn" data-chassis="hover">Hovercraft Cibernético</button>
+            <button class="chassis-btn" data-chassis="hover">Hovercraft</button>
             <button class="chassis-btn" data-chassis="railgun">Mecha Railgun</button>
           </div>
 
@@ -330,7 +290,7 @@
     </div>
   </div>
 
-  <!-- Scripts with Cache Buster -->
-  <script type="module" src="js/main.js?t=1724129700"></script>
+  <!-- Scripts -->
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
