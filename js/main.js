@@ -706,6 +706,14 @@ class Game {
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  new Game();
-});
+function initApp() {
+  if (!window.gameInstance) {
+    window.gameInstance = new Game();
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
