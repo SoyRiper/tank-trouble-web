@@ -262,11 +262,12 @@ class Game {
       };
     });
 
-    document.getElementById('btn-biome-toggle').onclick = () => {
-      const nextBiome = this.maze.cycleBiome();
-      this.ui.updateBiomeButton(nextBiome);
-      this.ui.showBanner(`MAPA: ${nextBiome.name.toUpperCase()}`, '', 1.2);
-    };
+    const biomeBtn = document.getElementById('btn-biome-toggle');
+    if (biomeBtn) {
+      biomeBtn.onclick = () => {
+        this.maze.generate();
+      };
+    }
 
     document.getElementById('btn-return-menu').onclick = () => {
       this.state = 'MENU';
@@ -437,8 +438,6 @@ class Game {
     this.crates = [];
     ChaosEvents.reset();
 
-    const biome = this.maze.cycleBiome();
-    this.ui.updateBiomeButton(biome);
     this.maze.generate();
 
     const spawns = this.maze.getPlayerSpawns(this.tanks.length);
@@ -456,7 +455,7 @@ class Game {
       this._spawnCrate();
     }
 
-    this.ui.showBanner(`MAPA: ${biome.name.toUpperCase()}`, '¡PREPARADOS!', 1.2);
+    this.ui.showBanner('¡PREPARADOS!', 'RONDA DE COMBATE', 1.2);
     setTimeout(() => {
       this.ui.showBanner('¡A COMBATIR!', '', 0.6);
       this.state = 'BATTLE';
@@ -472,8 +471,6 @@ class Game {
     this.crates = [];
     ChaosEvents.reset();
 
-    const biome = this.maze.cycleBiome();
-    this.ui.updateBiomeButton(biome);
     this.maze.generate(mazeSeed);
 
     const spawns = this.maze.getPlayerSpawns(this.tanks.length);
@@ -488,7 +485,7 @@ class Game {
       this._spawnCrate();
     }
 
-    this.ui.showBanner(`MAPA: ${biome.name.toUpperCase()}`, '¡EN LÍNEA!', 1.2);
+    this.ui.showBanner('¡EN LÍNEA!', '¡PREPÁRATE!', 1.2);
     setTimeout(() => {
       this.ui.showBanner('¡FUEGO!', '', 0.6);
       this.state = 'BATTLE';

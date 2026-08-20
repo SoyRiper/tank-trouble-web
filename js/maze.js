@@ -1,11 +1,5 @@
-﻿// Procedural Maze Generator & Multi-Biome Theming Engine with Seed Support
-
 export const BIOMES = [
-  { id: 'nordic', name: 'Minimalista Blanco', bg: '#FBFBF9', grid: 'rgba(230, 225, 218, 0.7)', wall: '#1C1E21', glow: false },
-  { id: 'desert', name: 'Desierto Táctico Militar', bg: '#E8DFC8', grid: 'rgba(62, 58, 51, 0.2)', wall: '#3E3A33', glow: false },
-  { id: 'lava', name: 'Volcán de Obsidiana', bg: '#161111', grid: 'rgba(255, 69, 0, 0.15)', wall: '#FF4500', glow: true, glowColor: 'rgba(255, 69, 0, 0.5)' },
-  { id: 'blueprint', name: 'Plano Técnico Blueprint', bg: '#0A192F', grid: 'rgba(100, 255, 218, 0.18)', wall: '#F1F5F9', glow: false },
-  { id: 'matrix', name: 'Terminal Matrix Esmeralda', bg: '#0A0F0D', grid: 'rgba(46, 204, 113, 0.16)', wall: '#2ECC71', glow: true, glowColor: 'rgba(46, 204, 113, 0.4)' }
+  { id: 'classic', name: 'Clásico Blanco', bg: '#FFFFFF', grid: 'rgba(230, 225, 218, 0.65)', wall: '#1C1E21', glow: false }
 ];
 
 export class Maze {
@@ -27,8 +21,8 @@ export class Maze {
   }
 
   cycleBiome() {
-    this.biomeIndex = (this.biomeIndex + 1) % BIOMES.length;
-    this.currentBiome = BIOMES[this.biomeIndex];
+    this.biomeIndex = 0;
+    this.currentBiome = BIOMES[0];
     return this.currentBiome;
   }
 
