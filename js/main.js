@@ -102,41 +102,66 @@ class Game {
     let joystickTouchId = null;
     let originX = 0;
     let originY = 0;
-    const maxRadius = 46;
+    const maxRadius = 45;
 
-    // A) Dynamic Floating Joystick (Spawns wherever thumb touches in left zone)
+    const resetJoystick = () => {
+      joystickTouchId = null;
+      joystickKnob.style.transform = 'translate(0px, 0px)';
+      this.joystick.active = false;
+      this.joystick.power = 0;
+    };
+
+    let fireTouchId = null;
+    const resetFire = () => {
+      fireTouchId = null;
+      this.joystick.shoot = false;
+      if (fireBtn) fireBtn.classList.remove('pressed');
+    };
+
+    // A) Left Analog Joystick with Self-Healing Multi-Touch Tracking
     const onJoystickTouchStart = (e) => {
-      for (let i = 0; i < e.changedTouches.length; i++) {
-        const touch = e.changedTouches[i];
-        if (joystickTouchId === null) {
-          e.preventDefault();
-          Sound.init();
-          joystickTouchId = touch.identifier;
+      if (e.cancelable) e.preventDefault();
+      Sound.init();
 
-          const rect = joystickZone.getBoundingClientRect();
-          originX = touch.clientX;
-          originY = touch.clientY;
+      // Clear stale touch ID if it is no longer touching the screen
+      const activeTouchIds = Array.from(e.touches).map(t => t.identifier);
+      if (joystickTouchId !== null && !activeTouchIds.includes(joystickTouchId)) {
+        joystickTouchId = null;
+      }
 
-          // Position the base exactly under thumb
-          joystickBase.style.display = 'flex';
-          joystickBase.style.left = `${touch.clientX - rect.left - 50}px`;
-          joystickBase.style.top = `${touch.clientY - rect.top - 50}px`;
-          joystickBase.style.transform = 'scale(1.05)';
-          joystickKnob.style.transform = 'translate(0px, 0px)';
+      if (e.changedTouches.length > 0) {
+        const touch = e.changedTouches[0];
+        joystickTouchId = touch.identifier;
 
-          this.joystick.active = false;
-          this.joystick.power = 0;
-          break;
+        const rect = joystickBase.getBoundingClientRect();
+        originX = rect.left + rect.width / 2;
+        originY = rect.top + rect.height / 2;
+
+        let dx = touch.clientX - originX;
+        let dy = touch.clientY - originY;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist > maxRadius) {
+          dx = (dx / dist) * maxRadius;
+          dy = (dy / dist) * maxRadius;
+        }
+
+        joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+
+        if (dist > 4) {
+          this.joystick.active = true;
+          this.joystick.targetAngle = Math.atan2(dy, dx);
+          this.joystick.power = Math.min(1.0, dist / maxRadius);
         }
       }
     };
 
     const onJoystickTouchMove = (e) => {
       if (joystickTouchId === null) return;
-      for (let i = 0; i < e.changedTouches.length; i++) {
-        const touch = e.changedTouches[i];
+      for (let i = 0; i < e.touches.length; i++) {
+        const touch = e.touches[i];
         if (touch.identifier === joystickTouchId) {
-          e.preventDefault();
+          if (e.cancelable) e.preventDefault();
 
           let dx = touch.clientX - originX;
           let dy = touch.clientY - originY;
@@ -149,7 +174,7 @@ class Game {
 
           joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
 
-          if (dist > 6) {
+          if (dist > 4) {
             this.joystick.active = true;
             this.joystick.targetAngle = Math.atan2(dy, dx);
             this.joystick.power = Math.min(1.0, dist / maxRadius);
@@ -157,22 +182,19 @@ class Game {
             this.joystick.active = false;
             this.joystick.power = 0;
           }
-          break;
+          return;
         }
       }
     };
 
     const onJoystickTouchEnd = (e) => {
-      if (joystickTouchId === null) return;
+      if (!e.touches || e.touches.length === 0) {
+        resetJoystick();
+        return;
+      }
       for (let i = 0; i < e.changedTouches.length; i++) {
-        const touch = e.changedTouches[i];
-        if (touch.identifier === joystickTouchId) {
-          if (e.cancelable) e.preventDefault();
-          joystickTouchId = null;
-          joystickKnob.style.transform = 'translate(0px, 0px)';
-          joystickBase.style.transform = 'scale(1.0)';
-          this.joystick.active = false;
-          this.joystick.power = 0;
+        if (e.changedTouches[i].identifier === joystickTouchId) {
+          resetJoystick();
           break;
         }
       }
@@ -183,13 +205,11 @@ class Game {
     window.addEventListener('touchend', onJoystickTouchEnd);
     window.addEventListener('touchcancel', onJoystickTouchEnd);
 
-    // B) Right Touch Fire Zone (100% Reliable Multi-Touch)
-    let fireTouchId = null;
-
+    // B) Right Touch Fire Zone (100% Non-locking Multi-Touch)
     const startFire = (e) => {
       if (e.cancelable) e.preventDefault();
       Sound.init();
-      if (e.changedTouches) {
+      if (e.changedTouches && e.changedTouches.length > 0) {
         fireTouchId = e.changedTouches[0].identifier;
       }
       this.joystick.shoot = true;
@@ -197,19 +217,17 @@ class Game {
     };
 
     const endFire = (e) => {
-      if (e.cancelable) e.preventDefault();
+      if (!e.touches || e.touches.length === 0) {
+        resetFire();
+        return;
+      }
       if (e.changedTouches && fireTouchId !== null) {
         for (let i = 0; i < e.changedTouches.length; i++) {
           if (e.changedTouches[i].identifier === fireTouchId) {
-            fireTouchId = null;
-            this.joystick.shoot = false;
-            if (fireBtn) fireBtn.classList.remove('pressed');
+            resetFire();
             break;
           }
         }
-      } else {
-        this.joystick.shoot = false;
-        if (fireBtn) fireBtn.classList.remove('pressed');
       }
     };
 
@@ -219,7 +237,7 @@ class Game {
       window.addEventListener('touchcancel', endFire);
 
       fireZone.addEventListener('mousedown', startFire);
-      window.addEventListener('mouseup', endFire);
+      window.addEventListener('mouseup', resetFire);
     }
   }
 
