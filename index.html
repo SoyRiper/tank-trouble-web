@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Tank Trouble — Modern Web 4.0</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=4.2.0">
 </head>
 <body>
 
@@ -26,12 +26,12 @@
         <canvas id="menuTankCanvas" width="200" height="200"></canvas>
       </div>
 
-      <button id="btn-menu-garage" class="btn-hero-garage">🛠️ Personalizar Tanque (Garaje)</button>
+      <button id="btn-menu-garage" class="btn-hero-garage" onclick="window.openGarageModal && window.openGarageModal()">🛠️ Personalizar Tanque (Garaje)</button>
     </div>
 
     <!-- Main Navigation Actions -->
     <div class="menu-action-grid">
-      <button id="btn-menu-singleplayer" class="btn-menu-card primary">
+      <button id="btn-menu-singleplayer" class="btn-menu-card primary" onclick="window.openModeModal && window.openModeModal()">
         <div class="card-icon">🤖</div>
         <div class="card-text">
           <span class="title">JUGAR VS BOTS / LOCAL</span>
@@ -40,7 +40,7 @@
         <span class="arrow">➔</span>
       </button>
 
-      <button id="btn-menu-multiplayer" class="btn-menu-card accent">
+      <button id="btn-menu-multiplayer" class="btn-menu-card accent" onclick="window.openMultiplayerModal && window.openMultiplayerModal()">
         <div class="card-icon">🌐</div>
         <div class="card-text">
           <span class="title">MULTIJUGADOR ONLINE</span>
@@ -91,7 +91,7 @@
       <div class="header-actions">
         <button id="btn-toggle-chat" class="btn-minimal" title="Abrir Chat">💬</button>
         <button id="btn-biome-toggle" class="btn-minimal" title="Cambiar Bioma">🗺️</button>
-        <button id="btn-in-game-garage" class="btn-minimal" title="Personalizar Tanque">🛠️</button>
+        <button id="btn-in-game-garage" class="btn-minimal" title="Personalizar Tanque" onclick="window.openGarageModal && window.openGarageModal()">🛠️</button>
         <button id="btn-return-menu" class="btn-minimal btn-danger" title="Salir al Menú">🚪 Salir</button>
       </div>
     </header>
@@ -163,9 +163,13 @@
 
   <!-- ================= MODAL: MULTIPLAYER ONLINE HUB ================= -->
   <div id="multiplayer-modal" class="modal-backdrop">
-    <div class="modal-panel" style="max-width: 540px;">
-      <h2 class="modal-title">🌐 Multijugador Online</h2>
+    <div class="modal-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 class="modal-title">🌐 Multijugador Online</h2>
+        <button class="btn-minimal" onclick="window.closeMultiplayerModal && window.closeMultiplayerModal()">✕</button>
+      </div>
 
+      <!-- Tabs -->
       <div class="mp-tabs">
         <button id="tab-btn-create" class="tab-btn active">Crear Sala (Host)</button>
         <button id="tab-btn-join" class="tab-btn">Unirse con Código</button>
@@ -211,61 +215,67 @@
       </div>
 
       <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
-        <button id="btn-close-mp-modal" class="btn-minimal">Volver</button>
+        <button id="btn-close-mp-modal" class="btn-minimal" onclick="window.closeMultiplayerModal && window.closeMultiplayerModal()">Volver</button>
       </div>
     </div>
   </div>
 
 
-  <!-- ================= MODAL: LOCAL / BOT MODE SELECTOR ================= -->
+  <!-- ================= MODAL: GAME MODE SELECTOR ================= -->
   <div id="mode-modal" class="modal-backdrop">
     <div class="modal-panel">
-      <h2 class="modal-title">Selecciona el Modo Local</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 class="modal-title">Seleccionar Modo de Batalla</h2>
+        <button class="btn-minimal" onclick="window.closeModeModal && window.closeModeModal()">✕</button>
+      </div>
       <div class="mode-grid">
         <button class="mode-btn" data-mode="1p_ai">
-          <span>1 Jugador vs Laika (IA Sniper)</span>
-          <span>➔</span>
+          <span>🤖 1 Jugador vs Laika (IA Táctica)</span>
+          <span class="tag">SOLO</span>
         </button>
         <button class="mode-btn" data-mode="2p">
-          <span>2 Jugadores (1 vs 1 Local)</span>
-          <span>➔</span>
+          <span>👥 2 Jugadores (1v1 Local)</span>
+          <span class="tag">DUEL</span>
         </button>
         <button class="mode-btn" data-mode="3p">
-          <span>3 Jugadores (Todos contra Todos)</span>
-          <span>➔</span>
+          <span>👥 3 Jugadores (Local)</span>
+          <span class="tag">TRIO</span>
         </button>
         <button class="mode-btn chaos" data-mode="chaos_ffa">
-          <span>⚡ Caos Total (4 Tanques FFA: Laika, Ares, Nexus) ⚡</span>
-          <span>➔</span>
+          <span>🔥 Caos Total FFA (4 Tanques + IA)</span>
+          <span class="tag" style="background:#E67E22; color:#fff;">CAOS</span>
         </button>
       </div>
-      <button id="btn-close-mode-modal" class="btn-minimal" style="align-self: flex-end;">Cerrar</button>
+      <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+        <button id="btn-close-mode-modal" class="btn-minimal" onclick="window.closeModeModal && window.closeModeModal()">Cancelar</button>
+      </div>
     </div>
   </div>
 
 
-  <!-- ================= MODAL: TANK GARAGE CUSTOMIZER ================= -->
+  <!-- ================= MODAL: GARAGE & CUSTOMIZER ================= -->
   <div id="garage-modal" class="modal-backdrop">
-    <div class="modal-panel" style="max-width: 650px;">
-      <h2 class="modal-title">🛠️ Taller de Personalización del Tanque</h2>
-      
+    <div class="modal-panel" style="max-width: 600px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 class="modal-title">🛠️ Garaje y Personalización</h2>
+        <button class="btn-minimal" onclick="window.closeGarageModal && window.closeGarageModal()">✕</button>
+      </div>
+
       <div class="garage-layout">
-        <!-- Live 360 Preview -->
         <div class="preview-box">
-          <canvas id="garagePreviewCanvas" width="180" height="180"></canvas>
+          <canvas id="garagePreviewCanvas" width="160" height="160"></canvas>
           <div class="input-group">
-            <label>Nombre del Piloto:</label>
-            <input type="text" id="pilot-name-input" maxlength="14" placeholder="COMANDANTE" value="COMANDANTE">
+            <label>Nombre de Piloto:</label>
+            <input type="text" id="pilot-name-input" maxlength="14" value="COMANDANTE">
           </div>
         </div>
 
-        <!-- Customization Options -->
         <div class="options-box">
           <label class="section-label">Modelo de Chasis:</label>
           <div class="chassis-selector">
             <button class="chassis-btn active" data-chassis="classic">Clásico Mk-I</button>
             <button class="chassis-btn" data-chassis="heavy">Behemoth Blindado</button>
-            <button class="chassis-btn" data-chassis="hover">Hovercraft</button>
+            <button class="chassis-btn" data-chassis="hover">Hovercraft Cibernético</button>
             <button class="chassis-btn" data-chassis="railgun">Mecha Railgun</button>
           </div>
 
@@ -290,7 +300,7 @@
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script type="module" src="js/main.js"></script>
+  <!-- Scripts with Cache Buster -->
+  <script type="module" src="js/main.js?v=4.2.0"></script>
 </body>
 </html>

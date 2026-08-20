@@ -83,35 +83,27 @@ export class UIManager {
       });
     }
 
-    bindTap(document.getElementById('btn-menu-singleplayer'), () => {
-      this.modeModal.classList.add('open');
-    });
-
-    bindTap(document.getElementById('btn-menu-multiplayer'), () => {
-      this.multiplayerModal.classList.add('open');
-    });
-
-    bindTap(document.getElementById('btn-menu-garage'), () => {
+    window.openModeModal = () => this.modeModal.classList.add('open');
+    window.openMultiplayerModal = () => this.multiplayerModal.classList.add('open');
+    window.openGarageModal = () => {
       this.garageModal.classList.add('open');
       Customizer.initPreview('garagePreviewCanvas');
-    });
+    };
+    window.closeModeModal = () => this.modeModal.classList.remove('open');
+    window.closeMultiplayerModal = () => this.multiplayerModal.classList.remove('open');
+    window.closeGarageModal = () => this.garageModal.classList.remove('open');
 
-    bindTap(document.getElementById('btn-in-game-garage'), () => {
-      this.garageModal.classList.add('open');
-      Customizer.initPreview('garagePreviewCanvas');
-    });
+    bindTap(document.getElementById('btn-menu-singleplayer'), window.openModeModal);
+    bindTap(document.getElementById('btn-menu-multiplayer'), window.openMultiplayerModal);
+    bindTap(document.getElementById('btn-menu-garage'), window.openGarageModal);
+    bindTap(document.getElementById('btn-in-game-garage'), window.openGarageModal);
 
     document.querySelectorAll('.modal-panel').forEach(panel => {
       panel.addEventListener('click', (e) => e.stopPropagation());
     });
 
-    bindTap(document.getElementById('btn-close-mode-modal'), () => {
-      this.modeModal.classList.remove('open');
-    });
-
-    bindTap(document.getElementById('btn-close-mp-modal'), () => {
-      this.multiplayerModal.classList.remove('open');
-    });
+    bindTap(document.getElementById('btn-close-mode-modal'), window.closeModeModal);
+    bindTap(document.getElementById('btn-close-mp-modal'), window.closeMultiplayerModal);
   }
 
   _setupChatUI() {
